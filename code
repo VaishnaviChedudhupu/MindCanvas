@@ -1,0 +1,3161 @@
+// ===== FRONTEND (React + Tailwind) =====
+
+// package.json (Frontend)
+{
+  "name": "mindcanvas-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0",
+    "axios": "^1.3.0",
+    "react-scripts": "5.0.1",
+    "lucide-react": "^0.263.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.2.0",
+    "@tailwindcss/typography": "^0.5.9",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        'serif': ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
+        'sans': ['Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+        },
+        neutral: {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
+        }
+      }
+    },
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
+}
+
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import Home from './pages/Home';
+import BlogList from './pages/BlogList';
+import SingleBlog from './pages/SingleBlog';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import AdminDashboard from './pages/AdminDashboard';
+import Login from './pages/Login';
+import './App.css';
+
+function App() {
+  return (
+    <Router>
+      <div className="App min-h-screen bg-neutral-50 flex flex-col">
+        <Navbar />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/blogs" element={<BlogList />} />
+            <Route path="/blog/:id" element={<SingleBlog />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+
+// src/components/Navbar.js
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  const navItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Blogs', path: '/blogs' },
+    { name: 'About', path: '/about' },
+    { name: 'Contact', path: '/contact' },
+  ];
+
+  const isActive = (path) => location.pathname === path;
+
+  return (
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <div className="text-2xl font-bold text-primary-600">
+              MindCanvas
+            </div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-8">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                    isActive(item.path)
+                      ? 'text-primary-600 border-b-2 border-primary-600'
+                      : 'text-neutral-600 hover:text-primary-600'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-neutral-400 hover:text-neutral-500 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      {isOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`block px-3 py-2 text-base font-medium transition-colors duration-200 ${
+                  isActive(item.path)
+                    ? 'text-primary-600 bg-primary-50'
+                    : 'text-neutral-600 hover:text-primary-600 hover:bg-neutral-50'
+                }`}
+                onClick={() => setIsOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Navbar;
+
+// src/components/Footer.js
+import React from 'react';
+import { Heart } from 'lucide-react';
+
+const Footer = () => {
+  return (
+    <footer className="bg-neutral-800 text-neutral-300">
+      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Brand */}
+          <div className="col-span-1">
+            <h3 className="text-2xl font-bold text-white mb-4">MindCanvas</h3>
+            <p className="text-neutral-400 mb-4">
+              Turn thoughts into tales, and silence into something powerful.
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div className="col-span-1">
+            <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
+            <ul className="space-y-2">
+              <li><a href="/" className="hover:text-white transition-colors">Home</a></li>
+              <li><a href="/blogs" className="hover:text-white transition-colors">Blogs</a></li>
+              <li><a href="/about" className="hover:text-white transition-colors">About</a></li>
+              <li><a href="/contact" className="hover:text-white transition-colors">Contact</a></li>
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div className="col-span-1">
+            <h4 className="text-lg font-semibold text-white mb-4">Connect</h4>
+            <p className="text-neutral-400 mb-2">Share your thoughts with the world</p>
+            <p className="text-neutral-400">mindcanvas@example.com</p>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-8 border-t border-neutral-700">
+          <div className="flex flex-col sm:flex-row justify-between items-center">
+            <p className="text-neutral-400 text-sm">
+              © 2024 MindCanvas. All rights reserved.
+            </p>
+            <p className="text-neutral-400 text-sm flex items-center mt-2 sm:mt-0">
+              Made with <Heart className="h-4 w-4 mx-1 text-red-500" /> for storytellers
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
+
+// src/pages/Home.js
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Feather, BookOpen, Users } from 'lucide-react';
+import axios from 'axios';
+
+const Home = () => {
+  const [recentPosts, setRecentPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/posts?limit=3');
+        setRecentPosts(response.data);
+      } catch (error) {
+        console.error('Error fetching recent posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecentPosts();
+  }, []);
+
+  const features = [
+    {
+      icon: <Feather className="h-8 w-8" />,
+      title: "Express Yourself",
+      description: "Transform your thoughts into compelling narratives that resonate with others."
+    },
+    {
+      icon: <BookOpen className="h-8 w-8" />,
+      title: "Rich Content",
+      description: "Create detailed blog posts with formatting, images, and engaging storytelling."
+    },
+    {
+      icon: <Users className="h-8 w-8" />,
+      title: "Community",
+      description: "Connect with fellow writers and readers in a supportive creative environment."
+    }
+  ];
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-primary-50 via-white to-neutral-50 py-20 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 mb-6">
+              Welcome to{' '}
+              <span className="text-primary-600">MindCanvas</span>
+            </h1>
+            <p className="text-xl sm:text-2xl text-neutral-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Turn thoughts into tales, and silence into something powerful.
+            </p>
+            <p className="text-lg text-neutral-500 mb-12 max-w-2xl mx-auto">
+              A serene space where ideas bloom into stories, and every voice finds its canvas.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/blogs"
+                className="inline-flex items-center px-8 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
+              >
+                Explore Stories
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+              <Link
+                to="/about"
+                className="inline-flex items-center px-8 py-3 bg-white text-primary-600 font-medium rounded-lg border-2 border-primary-600 hover:bg-primary-50 transition-colors duration-200"
+              >
+                Learn More
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
+              Why Choose MindCanvas?
+            </h2>
+            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+              We believe every thought has the power to inspire, and every silence holds a story waiting to be told.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div key={index} className="text-center p-6 rounded-xl bg-neutral-50 hover:bg-neutral-100 transition-colors duration-200">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 text-primary-600 rounded-full mb-6">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-neutral-900 mb-4">
+                  {feature.title}
+                </h3>
+                <p className="text-neutral-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Recent Posts Section */}
+      <section className="py-20 bg-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
+              Recent Stories
+            </h2>
+            <p className="text-lg text-neutral-600">
+              Discover the latest thoughts transformed into tales
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              <p className="mt-2 text-neutral-600">Loading stories...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {recentPosts.map((post) => (
+                <article key={post._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                  <div className="p-6">
+                    <div className="flex items-center text-sm text-neutral-500 mb-3">
+                      <time>{new Date(post.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}</time>
+                      <span className="mx-2">•</span>
+                      <span>{post.author}</span>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold text-neutral-900 mb-3 line-clamp-2">
+                      {post.title}
+                    </h3>
+                    
+                    <p className="text-neutral-600 mb-4 line-clamp-3">
+                      {post.excerpt || post.content.substring(0, 150) + '...'}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {post.tags && post.tags.slice(0, 3).map((tag, index) => (
+                        <span key={index} className="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <Link
+                      to={`/blog/${post._id}`}
+                      className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"
+                    >
+                      Read More
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+
+          <div className="text-center mt-12">
+            <Link
+              to="/blogs"
+              className="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200"
+            >
+              View All Stories
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;
+
+// src/pages/BlogList.js
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Search, ArrowRight, Calendar, User } from 'lucide-react';
+import axios from 'axios';
+
+const BlogList = () => {
+  const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/posts');
+        setPosts(response.data);
+        setFilteredPosts(response.data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    const filtered = posts.filter(post =>
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (post.tags && post.tags.some(tag => 
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      )) ||
+      post.content.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredPosts(filtered);
+    setCurrentPage(1);
+  }, [searchTerm, posts]);
+
+  // Pagination
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-neutral-600">Loading stories...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen py-12 bg-neutral-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-neutral-900 mb-4">
+            All Stories
+          </h1>
+          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+            Explore a collection of thoughts transformed into powerful tales
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto mb-12">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Search stories, tags, or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Results Info */}
+        <div className="mb-8">
+          <p className="text-neutral-600">
+            {searchTerm ? `Found ${filteredPosts.length} stories` : `${posts.length} stories total`}
+          </p>
+        </div>
+
+        {/* Blog Posts Grid */}
+        {currentPosts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-neutral-600 text-lg">
+              {searchTerm ? 'No stories found matching your search.' : 'No stories available yet.'}
+            </p>
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="mt-4 text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Clear search
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {currentPosts.map((post) => (
+              <article key={post._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                <div className="p-6">
+                  {/* Meta Info */}
+                  <div className="flex items-center text-sm text-neutral-500 mb-3">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    <time>{new Date(post.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}</time>
+                    <span className="mx-2">•</span>
+                    <User className="h-4 w-4 mr-1" />
+                    <span>{post.author}</span>
+                  </div>
+                  
+                  {/* Title */}
+                  <h2 className="text-xl font-semibold text-neutral-900 mb-3 line-clamp-2">
+                    {post.title}
+                  </h2>
+                  
+                  {/* Excerpt */}
+                  <p className="text-neutral-600 mb-4 line-clamp-3">
+                    {post.excerpt || post.content.substring(0, 150) + '...'}
+                  </p>
+                  
+                  {/* Tags */}
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {post.tags.slice(0, 3).map((tag, index) => (
+                        <span key={index} className="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                      {post.tags.length > 3 && (
+                        <span className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full">
+                          +{post.tags.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Read More Link */}
+                  <Link
+                    to={`/blog/${post._id}`}
+                    className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium transition-colors duration-200"
+                  >
+                    Read Full Story
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center space-x-2">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg ${
+                currentPage === 1
+                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-300'
+              }`}
+            >
+              Previous
+            </button>
+            
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`px-4 py-2 rounded-lg ${
+                  currentPage === index + 1
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-300'
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg ${
+                currentPage === totalPages
+                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-300'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default BlogList;
+
+// src/pages/SingleBlog.js
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, Calendar, User, Tag, ArrowRight } from 'lucide-react';
+import axios from 'axios';
+
+const SingleBlog = () => {
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+  const [relatedPosts, setRelatedPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/posts/${id}`);
+        setPost(response.data);
+        
+        // Fetch related posts (posts with similar tags)
+        if (response.data.tags && response.data.tags.length > 0) {
+          const relatedResponse = await axios.get(`http://localhost:5000/api/posts?tags=${response.data.tags.join(',')}&limit=3&exclude=${id}`);
+          setRelatedPosts(relatedResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching post:', error);
+        setError('Post not found');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-neutral-600">Loading story...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-neutral-900 mb-4">Story Not Found</h1>
+          <p className="text-neutral-600 mb-6">The story you're looking for doesn't exist.</p>
+          <Link
+            to="/blogs"
+            className="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200"
+          >
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            Back to Stories
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="bg-neutral-50 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link
+            to="/blogs"
+            className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium mb-8 transition-colors duration-200"
+          >
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            Back to Stories
+          </Link>
+          
+          <article>
+            {/* Meta Info */}
+            <div className="flex flex-wrap items-center text-sm text-neutral-500 mb-6">
+              <Calendar className="h-4 w-4 mr-1" />
+              <time className="mr-4">{new Date(post.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}</time>
+              <User className="h-4 w-4 mr-1" />
+              <span className="mr-4">{post.author}</span>
+              <span>•</span>
+              <span className="ml-4">{Math.ceil(post.content.split(' ').length / 200)} min read</span>
+            </div>
+            
+            {/* Title */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-900 mb-6 leading-tight">
+              {post.title}
+            </h1>
+            
+            {/* Tags */}
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-8">
+                {post.tags.map((tag, index) => (
+                  <span key={index} className="inline-flex items-center px-3 py-1 bg-primary-100 text-primary-700 text-sm rounded-full">
+                    <Tag className="h-3 w-3 mr-1" />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </article>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="prose prose-lg prose-neutral max-w-none">
+            {post.content.split('\n').map((paragraph, index) => (
+              <p key={index} className="mb-6 text-neutral-700 leading-relaxed text-lg">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          
+          {/* Share/Actions */}
+          <div className="mt-12 pt-8 border-t border-neutral-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-neutral-500">
+                Last updated: {new Date(post.updatedAt || post.createdAt).toLocaleDateString()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Related Posts */}
+      {relatedPosts.length > 0 && (
+        <div className="bg-neutral-50 py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-8 text-center">
+              Related Stories
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {relatedPosts.map((relatedPost) => (
+                <article key={relatedPost._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                  <div className="p-6">
+                    <div className="flex items-center text-sm text-neutral-500 mb-3">
+                      <time>{new Date(relatedPost.createdAt).toLocaleDateString()}</time>
+                      <span className="mx-2">•</span>
+                      <span>{relatedPost.author}</span>
+                    </div>
+                    
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-3 line-clamp-2">
+                      {relatedPost.title}
+                    </h3>
+                    
+                    <p className="text-neutral-600 mb-4 line-clamp-2">
+                      {relatedPost.content.substring(0, 100) + '...'}
+                    </p>
+                    
+                    <Link
+                      to={`/blog/${relatedPost._id}`}
+                      className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"
+                    >
+                      Read Story
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SingleBlog;
+
+// src/pages/About.js
+import React from 'react';
+import { Heart, Lightbulb, Users, Target } from 'lucide-react';
+
+const About = () => {
+  const values = [
+    {
+      icon: <Heart className="h-8 w-8" />,
+      title: "Authentic Expression",
+      description: "We believe every voice matters and deserves to be heard in its truest form."
+    },
+    {
+      icon: <Lightbulb className="h-8 w-8" />,
+      title: "Creative Inspiration",
+      description: "Fostering an environment where creativity flourishes and ideas come to life."
+    },
+    {
+      icon: <Users className="h-8 w-8" />,
+      title: "Supportive Community",
+      description: "Building connections between writers and readers who share a love for storytelling."
+    },
+    {
+      icon: <Target className="h-8 w-8" />,
+      title: "Meaningful Impact",
+      description: "Every story has the power to inspire, educate, and create positive change."
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-br from-primary-50 via-white to-neutral-50 py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold text-neutral-900 mb-6">
+            About <span className="text-primary-600">MindCanvas</span>
+          </h1>
+          <p className="text-xl text-neutral-600 leading-relaxed">
+            Turn thoughts into tales, and silence into something powerful.
+          </p>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-6">
+              Our Mission
+            </h2>
+            <p className="text-lg text-neutral-600 leading-relaxed mb-8">
+              MindCanvas was born from a simple belief: that everyone has a story worth telling, 
+              and every thought has the potential to inspire others. We created this platform as 
+              a serene digital space where ideas can bloom into narratives, where silence finds 
+              its voice, and where the art of storytelling thrives.
+            </p>
+            <p className="text-lg text-neutral-600 leading-relaxed">
+              In a world filled with noise, we offer a canvas for your mind—a place where 
+              thoughts transform into tales that resonate, inspire, and connect us all through 
+              the universal language of stories.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Values Section */}
+      <section className="py-20 bg-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-6">
+              What We Stand For
+            </h2>
+            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+              Our values guide everything we do, from the features we build to the 
+              community we nurture.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {values.map((value, index) => (
+              <div key={index} className="text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 text-primary-600 rounded-full mb-6">
+                  {value.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-neutral-900 mb-4">
+                  {value.title}
+                </h3>
+                <p className="text-neutral-600 leading-relaxed">
+                  {value.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vision Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-900 mb-6">
+              Our Vision
+            </h2>
+            <p className="text-lg text-neutral-600 leading-relaxed mb-8">
+              We envision a world where storytelling bridges differences, where every individual 
+              feels empowered to share their unique perspective, and where the digital space 
+              becomes a sanctuary for creative expression rather than a source of overwhelm.
+            </p>
+            <p className="text-lg text-neutral-600 leading-relaxed">
+              Through MindCanvas, we're building more than a blogging platform—we're cultivating 
+              a movement that celebrates the transformative power of words and the beauty of 
+              human connection through shared stories.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-20 bg-primary-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            Ready to Paint Your Canvas?
+          </h2>
+          <p className="text-xl text-primary-100 mb-8 leading-relaxed">
+            Join our community of storytellers and start transforming your thoughts into tales.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/blogs"
+              className="inline-flex items-center px-8 py-3 bg-white text-primary-600 font-medium rounded-lg hover:bg-neutral-100 transition-colors duration-200"
+            >
+              Explore Stories
+            </a>
+            <a
+              href="/contact"
+              className="inline-flex items-center px-8 py-3 bg-transparent text-white font-medium rounded-lg border-2 border-white hover:bg-white hover:text-primary-600 transition-colors duration-200"
+            >
+              Get in Touch
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default About;
+
+// src/pages/Contact.js
+import React, { useState } from 'react';
+import { Mail, MessageCircle, Send, CheckCircle } from 'lucide-react';
+import axios from 'axios';
+
+const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      await axios.post('http://localhost:5000/api/contact', formData);
+      setSuccess(true);
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setError('Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center p-8 bg-white rounded-xl shadow-sm">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="h-8 w-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-neutral-900 mb-4">Message Sent!</h2>
+          <p className="text-neutral-600 mb-6">
+            Thank you for reaching out. We'll get back to you soon.
+          </p>
+          <button
+            onClick={() => setSuccess(false)}
+            className="text-primary-600 hover:text-primary-700 font-medium"
+          >
+            Send Another Message
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-neutral-50">
+      {/* Header */}
+      <section className="bg-gradient-to-br from-primary-50 via-white to-neutral-50 py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold text-neutral-900 mb-6">
+            Get in Touch
+          </h1>
+          <p className="text-xl text-neutral-600 leading-relaxed">
+            Have a story to share? Questions about MindCanvas? We'd love to hear from you.
+          </p>
+        </div>
+      </section>
+
+      {/* Contact Form */}
+      <section className="py-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl shadow-sm p-8">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-8 w-8 text-primary-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-neutral-900 mb-2">
+                Share Your Thoughts
+              </h2>
+              <p className="text-neutral-600">
+                Whether it's feedback, collaboration ideas, or just to say hello
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
+                  placeholder="Enter your name"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows={6}
+                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200 resize-none"
+                  placeholder="Share your thoughts, ideas, or questions..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-5 w-5 mr-2" />
+                    Send Message
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Info */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-neutral-900 mb-6">
+              Other Ways to Connect
+            </h2>
+            <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8">
+              <div className="flex items-center text-neutral-600">
+                <Mail className="h-5 w-5 mr-2 text-primary-600" />
+                <span>mindcanvas@example.com</span>
+              </div>
+              <div className="text-neutral-600">
+                Response time: Within 24 hours
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Contact;
+
+// src/pages/Login.js
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Lock, User, Eye, EyeOff } from 'lucide-react';
+import axios from 'axios';
+
+const Login = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+      const response = await axios.post(`http://localhost:5000${endpoint}`, formData);
+      
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      navigate('/admin');
+    } catch (error) {
+      console.error('Auth error:', error);
+      setError(error.response?.data?.message || 'Authentication failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-neutral-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-bold text-neutral-900">
+            {isLogin ? 'Welcome Back' : 'Join MindCanvas'}
+          </h2>
+          <p className="mt-2 text-sm text-neutral-600">
+            {isLogin 
+              ? 'Sign in to access your admin dashboard' 
+              : 'Create an account to start managing your stories'
+            }
+          </p>
+        </div>
+        
+        <div className="bg-white rounded-xl shadow-sm p-8">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            {!isLogin && (
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-2">
+                  Username
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-5 w-5" />
+                  <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required={!isLogin}
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Choose a username"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-5 w-5" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 h-5 w-5" />
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-12 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                isLogin ? 'Sign In' : 'Create Account'
+              )}
+            </button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm text-primary-600 hover:text-primary-700"
+              >
+                {isLogin 
+                  ? "Don't have an account? Sign up" 
+                  : 'Already have an account? Sign in'
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+
+// src/pages/AdminDashboard.js
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Edit, Trash2, Eye, Save, X, LogOut } from 'lucide-react';
+import axios from 'axios';
+
+const AdminDashboard = () => {
+  const [posts, setPosts] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    author: '',
+    tags: '',
+    excerpt: ''
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+      navigate('/login');
+      return;
+    }
+
+    setUser(JSON.parse(userData));
+    fetchPosts();
+  }, [navigate]);
+
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/posts');
+      setPosts(response.data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/');
+  };
+
+  const handleEdit = (post) => {
+    setEditingPost(post);
+    setFormData({
+      title: post.title,
+      content: post.content,
+      author: post.author,
+      tags: post.tags ? post.tags.join(', ') : '',
+      excerpt: post.excerpt || ''
+    });
+    setIsEditing(true);
+  };
+
+  const handleCreate = () => {
+    setEditingPost(null);
+    setFormData({
+      title: '',
+      content: '',
+      author: user?.username || '',
+      tags: '',
+      excerpt: ''
+    });
+    setIsEditing(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const post = await Post.findByIdAndDelete(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    res.json({
+      message: 'Post deleted successfully',
+      deletedPost: post
+    });
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    res.status(500).json({ message: 'Error deleting post', error: error.message });
+  }
+});
+
+// GET /api/posts/slug/:slug - Get post by slug
+router.get('/slug/:slug', [
+  param('slug').trim().isLength({ min: 1 }).withMessage('Slug is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const post = await Post.findOne({ slug: req.params.slug, published: true });
+    
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Increment view count
+    post.views += 1;
+    await post.save();
+
+    res.json(post);
+  } catch (error) {
+    console.error('Error fetching post by slug:', error);
+    res.status(500).json({ message: 'Error fetching post', error: error.message });
+  }
+});
+
+module.exports = router;
+
+// routes/auth.js
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
+const User = require('../models/User');
+const auth = require('../middleware/auth');
+
+const router = express.Router();
+
+// JWT secret (should be in environment variables)
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+
+// Generate JWT token
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
+};
+
+// Validation rules
+const registerValidation = [
+  body('username')
+    .trim()
+    .isLength({ min: 3, max: 30 })
+    .withMessage('Username must be between 3 and 30 characters')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username can only contain letters, numbers, and underscores'),
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number')
+];
+
+const loginValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+];
+
+// POST /api/auth/register - Register new user
+router.post('/register', registerValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { username, email, password } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: existingUser.email === email 
+          ? 'Email already registered' 
+          : 'Username already taken'
+      });
+    }
+
+    // Create new user
+    const user = new User({
+      username,
+      email,
+      password,
+      role: 'admin' // First user becomes admin, you can modify this logic
+    });
+
+    await user.save();
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ 
+      message: 'Error registering user',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// POST /api/auth/login - Login user
+router.post('/login', loginValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email }).select('+password');
+    
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return res.status(401).json({ message: 'Account is deactivated' });
+    }
+
+    // Verify password
+    const isPasswordValid = await user.comparePassword(password);
+    
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    // Update last login
+    user.lastLogin = new Date();
+    await user.save();
+
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        lastLogin: user.lastLogin
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      message: 'Error during login',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// GET /api/auth/me - Get current user profile
+router.get('/me', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        profile: user.profile,
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Error fetching user profile' });
+  }
+});
+
+// PUT /api/auth/profile - Update user profile
+router.put('/profile', auth, [
+  body('profile.firstName').optional().trim().isLength({ max: 50 }),
+  body('profile.lastName').optional().trim().isLength({ max: 50 }),
+  body('profile.bio').optional().trim().isLength({ max: 500 }),
+  body('profile.website').optional().isURL(),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { profile } = req.body;
+    
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { $set: { profile } },
+      { new: true, runValidators: true }
+    );
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        profile: user.profile
+      }
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Error updating profile' });
+  }
+});
+
+// POST /api/auth/change-password - Change user password
+router.post('/change-password', auth, [
+  body('currentPassword').notEmpty().withMessage('Current password is required'),
+  body('newPassword')
+    .isLength({ min: 6 })
+    .withMessage('New password must be at least 6 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage('New password must contain at least one uppercase letter, one lowercase letter, and one number')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+    
+    const user = await User.findById(req.userId).select('+password');
+    
+    // Verify current password
+    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+    
+    if (!isCurrentPasswordValid) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ message: 'Error changing password' });
+  }
+});
+
+module.exports = router;
+
+// routes/contact.js
+const express = require('express');
+const { body, validationResult, query } = require('express-validator');
+const Contact = require('../models/Contact');
+const auth = require('../middleware/auth');
+
+const router = express.Router();
+
+// Validation rules
+const contactValidation = [
+  body('name')
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Name must be between 2 and 100 characters'),
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address'),
+  body('message')
+    .trim()
+    .isLength({ min: 10, max: 1000 })
+    .withMessage('Message must be between 10 and 1000 characters')
+];
+
+// POST /api/contact - Submit contact form
+router.post('/', contactValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { name, email, message } = req.body;
+
+    // Create new contact submission
+    const contact = new Contact({
+      name,
+      email,
+      message,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent')
+    });
+
+    await contact.save();
+
+    res.status(201).json({
+      message: 'Message sent successfully! We\'ll get back to you soon.',
+      contactId: contact._id
+    });
+  } catch (error) {
+    console.error('Error saving contact form:', error);
+    res.status(500).json({ 
+      message: 'Error sending message. Please try again later.',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+// GET /api/contact - Get all contact submissions (admin only)
+router.get('/', auth, [
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+  query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
+  query('status').optional().isIn(['new', 'read', 'replied', 'archived']).withMessage('Invalid status'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Build query
+    let query = {};
+    if (req.query.status) {
+      query.status = req.query.status;
+    }
+
+    const contacts = await Contact.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await Contact.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      contacts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalContacts: total,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching contacts:', error);
+    res.status(500).json({ message: 'Error fetching contacts' });
+  }
+});
+
+// PUT /api/contact/:id/status - Update contact status (admin only)
+router.put('/:id/status', auth, [
+  body('status').isIn(['new', 'read', 'replied', 'archived']).withMessage('Invalid status')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { status } = req.body;
+    
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!contact) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+
+    res.json({
+      message: 'Contact status updated successfully',
+      contact
+    });
+  } catch (error) {
+    console.error('Error updating contact status:', error);
+    res.status(500).json({ message: 'Error updating contact status' });
+  }
+});
+
+// DELETE /api/contact/:id - Delete contact (admin only)
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+
+    res.json({ message: 'Contact deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting contact:', error);
+    res.status(500).json({ message: 'Error deleting contact' });
+  }
+});
+
+module.exports = router;
+
+// middleware/auth.js
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
+
+/**
+ * Authentication middleware
+ * Verifies JWT token and attaches user info to request
+ */
+const auth = async (req, res, next) => {
+  try {
+    // Get token from header
+    const authHeader = req.header('Authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'Access denied. No valid token provided.' });
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+
+    try {
+      // Verify token
+      const decoded = jwt.verify(token, JWT_SECRET);
+      
+      // Check if user exists and is active
+      const user = await User.findById(decoded.userId);
+      
+      if (!user) {
+        return res.status(401).json({ message: 'Access denied. User not found.' });
+      }
+
+      if (!user.isActive) {
+        return res.status(401).json({ message: 'Access denied. Account is deactivated.' });
+      }
+
+      // Attach user info to request
+      req.userId = user._id;
+      req.user = {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      };
+      
+      next();
+    } catch (jwtError) {
+      console.error('JWT verification error:', jwtError.message);
+      return res.status(401).json({ message: 'Access denied. Invalid token.' });
+    }
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    res.status(500).json({ message: 'Internal server error during authentication.' });
+  }
+};
+
+/**
+ * Admin-only middleware
+ * Requires user to be authenticated and have admin role
+ */
+const adminOnly = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+  }
+};
+
+/**
+ * Role-based access control middleware
+ * @param {Array} roles - Array of allowed roles
+ */
+const requireRole = (roles) => {
+  return (req, res, next) => {
+    if (req.user && roles.includes(req.user.role)) {
+      next();
+    } else {
+      res.status(403).json({ 
+        message: 'Access denied. Insufficient privileges.',
+        requiredRoles: roles,
+        userRole: req.user ? req.user.role : 'none'
+      });
+    }
+  };
+};
+
+module.exports = {
+  auth,
+  adminOnly,
+  requireRole
+};
+
+// .env (Environment Variables - Create this file)
+# Database
+MONGODB_URI=mongodb://localhost:27017/mindcanvas
+# For production, use MongoDB Atlas:
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/mindcanvas
+
+# JWT Secret (Change this to a secure random string)
+JWT_SECRET=your-super-secure-jwt-secret-key-min-32-characters
+
+# Server Configuration
+PORT=5000
+NODE_ENV=development
+
+# Frontend URL (for CORS)
+FRONTEND_URL=http://localhost:3000
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Email Configuration (Optional - for future email features)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+
+# ===== SETUP INSTRUCTIONS =====
+
+/*
+## 🚀 Setup Instructions
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB (local installation or MongoDB Atlas)
+- Git
+
+### Frontend Setup
+
+1. **Create React App & Install Dependencies**
+   ```bash
+   npx create-react-app mindcanvas-frontend
+   cd mindcanvas-frontend
+   npm install react-router-dom axios lucide-react
+   npm install -D tailwindcss @tailwindcss/typography autoprefixer postcss
+   npx tailwindcss init -p
+   ```
+
+2. **Replace Generated Files**
+   - Copy all frontend code from artifact into respective files
+   - Make sure folder structure matches the imports
+
+3. **Start Frontend**
+   ```bash
+   npm start
+   # Runs on http://localhost:3000
+   ```
+
+### Backend Setup
+
+1. **Create Backend Directory & Install Dependencies**
+   ```bash
+   mkdir mindcanvas-backend
+   cd mindcanvas-backend
+   npm init -y
+   npm install express mongoose cors bcryptjs jsonwebtoken dotenv express-rate-limit helmet morgan express-validator
+   npm install -D nodemon
+   ```
+
+2. **Create File Structure**
+   ```
+   mindcanvas-backend/
+   ├── server.js
+   ├── package.json
+   ├── .env
+   ├── models/
+   │   ├── Post.js
+   │   ├── User.js
+   │   └── Contact.js
+   ├── routes/
+   │   ├── posts.js
+   │   ├── auth.js
+   │   └── contact.js
+   └── middleware/
+       └── auth.js
+   ```
+
+3. **Environment Variables**
+   - Create `.env` file with the provided template
+   - Update MongoDB URI and JWT secret
+
+4. **Start Backend**
+   ```bash
+   npm run dev
+   # Runs on http://localhost:5000
+   ```
+
+### Database Setup
+
+1. **Local MongoDB**
+   ```bash
+   # Install MongoDB locally or use Docker
+   mongod --dbpath /data/db
+   ```
+
+2. **MongoDB Atlas (Recommended for production)**
+   - Create account at mongodb.com/atlas
+   - Create cluster and get connection string
+   - Update MONGODB_URI in .env
+
+### Running the Application
+
+1. **Start Backend** (Terminal 1)
+   ```bash
+   cd mindcanvas-backend
+   npm run dev
+   ```
+
+2. **Start Frontend** (Terminal 2)
+   ```bash
+   cd mindcanvas-frontend
+   npm start
+   ```
+
+3. **Visit Application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+
+### First Time Setup
+
+1. **Create Admin Account**
+   - Go to http://localhost:3000/login
+   - Click "Don't have an account? Sign up"
+   - Register (first user becomes admin)
+
+2. **Create Your First Post**
+   - Login and go to http://localhost:3000/admin
+   - Click "New Post" to create content
+
+### Production Deployment
+
+1. **Build Frontend**
+   ```bash
+   cd mindcanvas-frontend
+   npm run build
+   ```
+
+2. **Environment Variables**
+   - Set NODE_ENV=production
+   - Use secure JWT secret
+   - Configure MongoDB Atlas URI
+   - Set proper FRONTEND_URL
+
+3. **Deploy Options**
+   - **Frontend**: Vercel, Netlify, or serve build folder
+   - **Backend**: Heroku, Railway, DigitalOcean, or AWS
+
+### API Endpoints
+
+**Public Endpoints:**
+- GET /api/posts - Get all posts
+- GET /api/posts/:id - Get single post
+- POST /api/contact - Submit contact form
+- POST /api/auth/login - User login
+- POST /api/auth/register - User registration
+
+**Protected Endpoints (Require Authentication):**
+- POST /api/posts - Create post
+- PUT /api/posts/:id - Update post  
+- DELETE /api/posts/:id - Delete post
+- GET /api/contact - Get contacts (admin)
+
+### Features Included
+
+✅ **Frontend Features:**
+- Responsive design (mobile, tablet, desktop)
+- Modern UI with Tailwind CSS
+- Blog listing with pagination
+- Search functionality
+- Single blog post view
+- Contact form
+- Admin dashboard
+- Authentication (login/signup)
+
+✅ **Backend Features:**
+- RESTful API with Express.js
+- MongoDB integration with Mongoose
+- User authentication with JWT
+- Password hashing with bcrypt
+- Input validation
+- Error handling
+- Rate limiting
+- Security headers
+- CORS configuration
+
+✅ **Admin Features:**
+- Create, edit, delete posts
+- User management
+- Contact form submissions
+- Protected routes
+
+### Security Features
+
+- JWT-based authentication
+- Password hashing
+- Input validation and sanitization
+- Rate limiting
+- CORS configuration
+- Security headers with Helmet
+- MongoDB injection prevention
+
+### Customization
+
+**Styling:**
+- Modify colors in `tailwind.config.js`
+- Update components in `src/components/`
+- Customize pages in `src/pages/`
+
+**Functionality:**
+- Add new API endpoints in `routes/`
+- Create new database models in `models/`
+- Extend middleware in `middleware/`
+
+### Troubleshooting
+
+**Common Issues:**
+- Port conflicts: Change ports in package.json scripts
+- MongoDB connection: Verify connection string and MongoDB service
+- CORS errors: Check FRONTEND_URL in backend .env
+- Build errors: Ensure all dependencies are installed
+
+**Support:**
+- Check browser console for frontend errors
+- Check server logs for backend errors
+- Verify environment variables are set correctly
+*/Data = {
+      ...formData,
+      tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+    };
+
+    try {
+      if (editingPost) {
+        await axios.put(`http://localhost:5000/api/posts/${editingPost._id}`, postData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+      } else {
+        await axios.post('http://localhost:5000/api/posts', postData, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+      }
+      
+      fetchPosts();
+      setIsEditing(false);
+      setEditingPost(null);
+    } catch (error) {
+      console.error('Error saving post:', error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      try {
+        await axios.delete(`http://localhost:5000/api/posts/${id}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        fetchPosts();
+      } catch (error) {
+        console.error('Error deleting post:', error);
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-neutral-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-neutral-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <h1 className="text-2xl font-bold text-neutral-900">Admin Dashboard</h1>
+            <div className="flex items-center space-x-4">
+              <span className="text-neutral-600">Welcome, {user?.username}</span>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Actions Bar */}
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-xl font-semibold text-neutral-900">
+            Manage Posts ({posts.length})
+          </h2>
+          <button
+            onClick={handleCreate}
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            New Post
+          </button>
+        </div>
+
+        {/* Editor Modal */}
+        {isEditing && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center p-6 border-b">
+                <h3 className="text-lg font-semibold text-neutral-900">
+                  {editingPost ? 'Edit Post' : 'Create New Post'}
+                </h3>
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="text-neutral-400 hover:text-neutral-600"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      required
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.author}
+                      onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                      required
+                      className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Tags (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                    placeholder="e.g. inspiration, creativity, storytelling"
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Excerpt (optional)
+                  </label>
+                  <textarea
+                    value={formData.excerpt}
+                    onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                    rows={3}
+                    placeholder="A brief summary of your post..."
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Content
+                  </label>
+                  <textarea
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    required
+                    rows={12}
+                    placeholder="Write your story here..."
+                    className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="px-6 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="inline-flex items-center px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {editingPost ? 'Update Post' : 'Create Post'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Posts Table */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          {posts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-neutral-600 text-lg mb-4">No posts yet</p>
+              <button
+                onClick={handleCreate}
+                className="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors duration-200"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Create Your First Post
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-neutral-200">
+                <thead className="bg-neutral-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Author
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Tags
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-neutral-200">
+                  {posts.map((post) => (
+                    <tr key={post._id} className="hover:bg-neutral-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-neutral-900 truncate max-w-xs">
+                          {post.title}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-neutral-500">{post.author}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-neutral-500">
+                          {new Date(post.createdAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {post.tags?.slice(0, 2).map((tag, index) => (
+                            <span key={index} className="px-2 py-1 text-xs bg-primary-100 text-primary-700 rounded-full">
+                              {tag}
+                            </span>
+                          ))}
+                          {post.tags?.length > 2 && (
+                            <span className="px-2 py-1 text-xs bg-neutral-100 text-neutral-600 rounded-full">
+                              +{post.tags.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <a
+                            href={`/blog/${post._id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-neutral-400 hover:text-neutral-600 p-2"
+                            title="View Post"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </a>
+                          <button
+                            onClick={() => handleEdit(post)}
+                            className="text-primary-600 hover:text-primary-900 p-2"
+                            title="Edit Post"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(post._id)}
+                            className="text-red-600 hover:text-red-900 p-2"
+                            title="Delete Post"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
+
+// src/App.css
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// src/index.js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// src/index.css
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+// ===== BACKEND (Node.js + Express + MongoDB) =====
+
+// package.json (Backend)
+{
+  "name": "mindcanvas-backend",
+  "version": "1.0.0",
+  "description": "Backend for MindCanvas blog platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^6.8.4",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "dotenv": "^16.0.3",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^6.0.1",
+    "morgan": "^1.10.0",
+    "express-validator": "^6.14.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "blog",
+    "nodejs",
+    "express",
+    "mongodb",
+    "api"
+  ],
+  "author": "MindCanvas Team",
+  "license": "MIT"
+}
+
+// server.js
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+
+const app = express();
+
+// Import routes
+const postRoutes = require('./routes/posts');
+const authRoutes = require('./routes/auth');
+const contactRoutes = require('./routes/contact');
+
+// Security middleware
+app.use(helmet());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+app.use(limiter);
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Logging middleware
+app.use(morgan('combined'));
+
+// MongoDB connection
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mindcanvas', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error('Database connection error:', error);
+    process.exit(1);
+  }
+};
+
+connectDB();
+
+// Routes
+app.use('/api/posts', postRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/contact', contactRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    message: 'MindCanvas API is running smoothly'
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to MindCanvas API',
+    version: '1.0.0',
+    documentation: '/api/docs'
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
+  });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    message: 'Route not found',
+    path: req.originalUrl
+  });
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 MindCanvas server running on port ${PORT}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+});
+
+// models/Post.js
+const mongoose = require('mongoose');
+
+const postSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, 'Post title is required'],
+    trim: true,
+    maxlength: [200, 'Title cannot exceed 200 characters']
+  },
+  content: {
+    type: String,
+    required: [true, 'Post content is required'],
+    minlength: [50, 'Content must be at least 50 characters long']
+  },
+  excerpt: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Excerpt cannot exceed 500 characters']
+  },
+  author: {
+    type: String,
+    required: [true, 'Author name is required'],
+    trim: true,
+    maxlength: [100, 'Author name cannot exceed 100 characters']
+  },
+  tags: [{
+    type: String,
+    trim: true,
+    lowercase: true
+  }],
+  published: {
+    type: Boolean,
+    default: true
+  },
+  views: {
+    type: Number,
+    default: 0
+  },
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true
+  }
+}, {
+  timestamps: true, // Adds createdAt and updatedAt fields
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Create slug from title before saving
+postSchema.pre('save', function(next) {
+  if (this.isModified('title')) {
+    this.slug = this.title
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9\s]/g, '')
+      .replace(/\s+/g, '-')
+      .trim();
+  }
+  next();
+});
+
+// Virtual for formatted creation date
+postSchema.virtual('formattedDate').get(function() {
+  return this.createdAt.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+});
+
+// Index for better query performance
+postSchema.index({ title: 'text', content: 'text', tags: 'text' });
+postSchema.index({ createdAt: -1 });
+postSchema.index({ published: 1 });
+
+module.exports = mongoose.model('Post', postSchema);
+
+// models/User.js
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: [true, 'Username is required'],
+    unique: true,
+    trim: true,
+    minlength: [3, 'Username must be at least 3 characters long'],
+    maxlength: [30, 'Username cannot exceed 30 characters'],
+    match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores']
+  },
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    lowercase: true,
+    trim: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address']
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    minlength: [6, 'Password must be at least 6 characters long']
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'moderator'],
+    default: 'user'
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  lastLogin: {
+    type: Date
+  },
+  profile: {
+    firstName: String,
+    lastName: String,
+    bio: String,
+    avatar: String,
+    website: String,
+    social: {
+      twitter: String,
+      linkedin: String,
+      github: String
+    }
+  }
+}, {
+  timestamps: true,
+  toJSON: { 
+    transform: function(doc, ret) {
+      delete ret.password;
+      return ret;
+    }
+  }
+});
+
+// Hash password before saving
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  try {
+    const salt = await bcrypt.genSalt(12);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Compare password method
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Virtual for full name
+userSchema.virtual('fullName').get(function() {
+  if (this.profile?.firstName && this.profile?.lastName) {
+    return `${this.profile.firstName} ${this.profile.lastName}`;
+  }
+  return this.username;
+});
+
+module.exports = mongoose.model('User', userSchema);
+
+// models/Contact.js
+const mongoose = require('mongoose');
+
+const contactSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+    trim: true,
+    maxlength: [100, 'Name cannot exceed 100 characters']
+  },
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    lowercase: true,
+    trim: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address']
+  },
+  message: {
+    type: String,
+    required: [true, 'Message is required'],
+    trim: true,
+    minlength: [10, 'Message must be at least 10 characters long'],
+    maxlength: [1000, 'Message cannot exceed 1000 characters']
+  },
+  status: {
+    type: String,
+    enum: ['new', 'read', 'replied', 'archived'],
+    default: 'new'
+  },
+  ipAddress: String,
+  userAgent: String
+}, {
+  timestamps: true
+});
+
+// Index for better query performance
+contactSchema.index({ createdAt: -1 });
+contactSchema.index({ status: 1 });
+
+module.exports = mongoose.model('Contact', contactSchema);
+
+// routes/posts.js
+const express = require('express');
+const { body, validationResult, param, query } = require('express-validator');
+const Post = require('../models/Post');
+const auth = require('../middleware/auth');
+
+const router = express.Router();
+
+// Validation middleware
+const postValidation = [
+  body('title')
+    .trim()
+    .isLength({ min: 5, max: 200 })
+    .withMessage('Title must be between 5 and 200 characters'),
+  body('content')
+    .trim()
+    .isLength({ min: 50 })
+    .withMessage('Content must be at least 50 characters long'),
+  body('author')
+    .trim()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Author name must be between 2 and 100 characters'),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array')
+];
+
+// GET /api/posts - Get all posts with filtering, pagination, and search
+router.get('/', [
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+  query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('Limit must be between 1 and 50'),
+  query('search').optional().trim().escape(),
+  query('tags').optional().trim(),
+  query('author').optional().trim().escape(),
+  query('exclude').optional().isMongoId().withMessage('Exclude must be a valid ID')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Build query object
+    let query = { published: true };
+
+    // Search functionality
+    if (req.query.search) {
+      query.$or = [
+        { title: { $regex: req.query.search, $options: 'i' } },
+        { content: { $regex: req.query.search, $options: 'i' } },
+        { tags: { $in: [new RegExp(req.query.search, 'i')] } }
+      ];
+    }
+
+    // Filter by tags
+    if (req.query.tags) {
+      const tagsArray = req.query.tags.split(',').map(tag => tag.trim());
+      query.tags = { $in: tagsArray };
+    }
+
+    // Filter by author
+    if (req.query.author) {
+      query.author = { $regex: req.query.author, $options: 'i' };
+    }
+
+    // Exclude specific post (for related posts)
+    if (req.query.exclude) {
+      query._id = { $ne: req.query.exclude };
+    }
+
+    const posts = await Post.find(query)
+      .select('title content excerpt author tags createdAt updatedAt views')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await Post.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      posts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalPosts: total,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ message: 'Error fetching posts', error: error.message });
+  }
+});
+
+// GET /api/posts/:id - Get single post by ID
+router.get('/:id', [
+  param('id').isMongoId().withMessage('Invalid post ID')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Increment view count
+    post.views += 1;
+    await post.save();
+
+    res.json(post);
+  } catch (error) {
+    console.error('Error fetching post:', error);
+    res.status(500).json({ message: 'Error fetching post', error: error.message });
+  }
+});
+
+// POST /api/posts - Create new post (protected route)
+router.post('/', auth, postValidation, async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { title, content, excerpt, author, tags } = req.body;
+
+    const post = new Post({
+      title,
+      content,
+      excerpt,
+      author,
+      tags: tags || []
+    });
+
+    await post.save();
+
+    res.status(201).json({
+      message: 'Post created successfully',
+      post
+    });
+  } catch (error) {
+    console.error('Error creating post:', error);
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'A post with this title already exists' });
+    }
+    res.status(500).json({ message: 'Error creating post', error: error.message });
+  }
+});
+
+// PUT /api/posts/:id - Update post (protected route)
+router.put('/:id', auth, [
+  param('id').isMongoId().withMessage('Invalid post ID'),
+  ...postValidation
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { title, content, excerpt, author, tags, published } = req.body;
+
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        content,
+        excerpt,
+        author,
+        tags: tags || [],
+        published: published !== undefined ? published : true
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    res.json({
+      message: 'Post updated successfully',
+      post
+    });
+  } catch (error) {
+    console.error('Error updating post:', error);
+    res.status(500).json({ message: 'Error updating post', error: error.message });
+  }
+});
+
+// DELETE /api/posts/:id - Delete post (protected route)
+router.delete('/:id', auth, [
+  param('id').isMongoId().withMessage('Invalid post ID')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const post
